@@ -18,7 +18,6 @@ import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { FirebaseError } from "firebase/app";
 import { Eye, EyeClosed, LoaderCircle } from "lucide-react";
-import { NextRequest } from "next/server";
 import Cookies from "js-cookie";
 
 const formSchema = z.object({
@@ -44,18 +43,25 @@ export default function SigninForm() {
 
   async function submitForm(formValue: FormSchema) {
     setLoading(true);
+
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
         formValue.email,
         formValue.password,
       );
-      const token = await userCredential.user.getIdToken();
-      Cookies.set("token", token, { expires: 1 }); // O token expira em 1 dia
+
       setLoading(false);
+
+      const token = await userCredential.user.getIdToken();
+      Cookies.set("auth-token", token, { expires: 1 });
+
+      stayLoggedIn();
+
       router.push("/dashboard");
     } catch (err) {
       setLoading(false);
+
       if (err instanceof FirebaseError) {
         switch (err.code) {
           case "auth/invalid-credential":
@@ -66,6 +72,14 @@ export default function SigninForm() {
       }
     }
   }
+
+  const stayLoggedIn = async () => {
+    await onAuthStateChanged(auth, (user) => {
+      Cookies.set("auth-token", JSON.stringify(user?.getIdToken), {
+        expires: 1,
+      });
+    });
+  };
 
   function togglePasswordVisibility() {
     setPasswordVisible((prev) => !prev);

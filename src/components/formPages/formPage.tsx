@@ -25,7 +25,7 @@ const LeftDivPage = forwardRef<
   <div
     ref={ref}
     className={cn(
-      "hidden flex-col items-start justify-center gap-1 bg-foreground pl-0 text-left font-Poppins text-4xl font-semibold text-muted-foreground md:flex md:min-h-dvh md:w-1/2",
+      "hidden w-full flex-col items-start justify-center gap-1 bg-foreground pl-0 text-left font-Poppins text-4xl font-semibold text-muted-foreground md:flex md:min-h-dvh md:w-1/2",
       className,
     )}
     {...props}
