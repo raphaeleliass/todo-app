@@ -1,3 +1,4 @@
+"use client";
 import {
   createContext,
   Dispatch,
@@ -7,18 +8,25 @@ import {
   useState,
 } from "react";
 
-interface userContextType {
+interface User {
+  email: string | null;
   uid: string | null;
-  setUid: Dispatch<SetStateAction<string | null>>;
+  photo: string | null;
+  name: string | null;
 }
 
-const UserContext = createContext<userContextType | undefined>(undefined);
+interface userContextType {
+  user: User | null;
+  setUser: Dispatch<SetStateAction<User | null>>;
+}
+
+const UserContext = createContext<userContextType | null>(null);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [uid, setUid] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   return (
-    <UserContext.Provider value={{ uid, setUid }}>
+    <UserContext.Provider value={{ user, setUser }}>
       {children}
     </UserContext.Provider>
   );

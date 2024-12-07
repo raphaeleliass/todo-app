@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { Poppins, Montserrat } from "next/font/google";
 import "./globals.css";
-import { SidebarProvider } from "@/components/ui/sidebar";
-
+import { UserProvider } from "./context/userContext";
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "500", "700", "800"],
+  weight: ["300", "400", "600", "700"],
   fallback: ["sans-serif"],
   display: "swap",
   variable: "--font-poppins",
@@ -14,7 +13,7 @@ const poppins = Poppins({
 
 const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["400", "500", "700", "800"],
+  weight: ["300", "400", "600", "700"],
   fallback: ["sans-serif"],
   display: "swap",
   variable: "--font-montserrat",
@@ -35,7 +34,7 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} ${montserrat.variable} antialiased`}
       >
-        <SidebarProvider>{children}</SidebarProvider>
+        <UserProvider>{children}</UserProvider>
       </body>
     </html>
   );

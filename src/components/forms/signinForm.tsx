@@ -14,11 +14,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { auth } from "@/firebase/firebaseConfig";
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { FirebaseError } from "firebase/app";
 import { Eye, EyeClosed, LoaderCircle } from "lucide-react";
-import Cookies from "js-cookie";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -30,7 +29,6 @@ type FormSchema = z.infer<typeof formSchema>;
 export default function SigninForm() {
   const [loading, setLoading] = useState<boolean>(false);
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
-
   const router = useRouter();
 
   const form = useForm<FormSchema>({
@@ -45,19 +43,13 @@ export default function SigninForm() {
     setLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
+      await signInWithEmailAndPassword(
         auth,
         formValue.email,
         formValue.password,
       );
 
       setLoading(false);
-
-      const token = await userCredential.user.getIdToken();
-      Cookies.set("auth-token", token, { expires: 1 });
-
-      stayLoggedIn();
-
       router.push("/dashboard");
     } catch (err) {
       setLoading(false);
@@ -72,14 +64,6 @@ export default function SigninForm() {
       }
     }
   }
-
-  const stayLoggedIn = async () => {
-    await onAuthStateChanged(auth, (user) => {
-      Cookies.set("auth-token", JSON.stringify(user?.getIdToken), {
-        expires: 1,
-      });
-    });
-  };
 
   function togglePasswordVisibility() {
     setPasswordVisible((prev) => !prev);

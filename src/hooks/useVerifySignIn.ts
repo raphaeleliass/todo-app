@@ -1,4 +1,5 @@
 "use client";
+import { UseUser } from "@/app/context/userContext";
 import { auth } from "@/firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -12,19 +13,27 @@ interface userData {
 export default function useVerifySignIn(redirect: string) {
   const [userData, setUserData] = useState<userData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const { setUser } = UseUser();
   const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setLoading(false);
-        setUserData({ email: user.email, uid: user.uid });
+        const userObj = {
+          email: user.email,
+          uid: user.uid,
+          photo: user.photoURL,
+          name: user.displayName,
+        };
+        setUserData(userObj);
+        setUser(userObj);
       } else if (!user) {
         router.push(redirect);
       }
     });
 
     return () => unsubscribe();
-  }, [router, redirect]);
+  }, [router, redirect, setUser]);
   return { userData, loading };
 }
