@@ -4,10 +4,14 @@ import { auth } from "@/firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function VerifyEmail() {
   const router = useRouter();
+
+  function reloadPage() {
+    router.replace("/dashboard");
+  }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -28,9 +32,9 @@ export default function VerifyEmail() {
       </h1>
       <p className="text-sm">
         Check your mailbox. If you have already verified your email, please{" "}
-        <Link href="/dashboard" className="text-blue-600 underline">
+        <Button variant={"link"} onClick={reloadPage}>
           click here
-        </Link>
+        </Button>
       </p>
     </main>
   );

@@ -41,7 +41,7 @@ export function AppSidebar() {
         <Avatar>
           <AvatarImage>{user?.photo}</AvatarImage>
           <AvatarFallback>
-            {user?.email?.slice(0, 2).toUpperCase()}
+            {user?.name?.slice(0, 2).toUpperCase()}
           </AvatarFallback>
         </Avatar>
         <div className="flex flex-col">

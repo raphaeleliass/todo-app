@@ -19,13 +19,19 @@ import { FirebaseError } from "firebase/app";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  updateProfile,
 } from "firebase/auth";
 import { Eye, EyeClosed, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 
 const formSchema = z
   .object({
-    email: z.string().email("Invalid email").trim(),
+    name: z.string().min(1, "Name field can't be empty").trim(),
+    lastName: z
+      .string()
+      .min(3, "Last name must be 3 characters at least")
+      .trim(),
+    email: z.string().email("This email isn't valid").trim(),
     password: z
       .string()
       .min(6, "Password must be 6 characters at least")
@@ -52,6 +58,8 @@ export default function SignupForm() {
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -66,6 +74,22 @@ export default function SignupForm() {
     }
   }
 
+  async function setAdditionalUserInformations(
+    userName: string,
+    lastName: string,
+  ) {
+    const user = auth.currentUser;
+    try {
+      if (user) {
+        await updateProfile(user, {
+          displayName: `${userName} ${lastName}`,
+        });
+      }
+    } catch (err) {
+      alert(err);
+    }
+  }
+
   async function submitForm(formValue: FormSchema) {
     setLoading(true);
 
@@ -75,7 +99,7 @@ export default function SignupForm() {
         formValue.email,
         formValue.password,
       );
-
+      await setAdditionalUserInformations(formValue.name, formValue.lastName);
       setLoading(false);
       form.reset();
       sendVerificationEmail();
@@ -108,6 +132,44 @@ export default function SignupForm() {
         id="signUpForm"
       >
         <FormField
+          name="name"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-muted-foreground">Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Enter your name"
+                  type="text"
+                  autoComplete="off"
+                  aria-label="input to place your name"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="lastName"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-muted-foreground">Last Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Enter your last name"
+                  type="text"
+                  autoComplete="off"
+                  aria-label="input to place your last name"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
           name="email"
           control={form.control}
           render={({ field }) => (
@@ -116,7 +178,7 @@ export default function SignupForm() {
               <FormControl>
                 <Input
                   placeholder="Digite seu email"
-                  type="email"
+                  type="text"
                   autoComplete="off"
                   aria-label="input to place your email"
                   {...field}
