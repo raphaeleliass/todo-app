@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import useVerifySignIn from "@/hooks/useVerifySignIn";
+import useVerifySignIn from "@/hooks/useUserLoggedIn";
 import { ArrowRight, ArrowUpRight, LogIn } from "lucide-react";
 import Link from "next/link";
 

@@ -1,5 +1,5 @@
 "use client";
-import { UseUser } from "@/app/context/userContext";
+import { UseUser } from "@/context/userContext";
 import { auth } from "@/firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,7 @@ interface userData {
   uid: string | null;
 }
 
-export default function useVerifySignIn(redirect: string) {
+export default function useUserLoggedIn(redirect: string) {
   const [userData, setUserData] = useState<userData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const { setUser } = UseUser();

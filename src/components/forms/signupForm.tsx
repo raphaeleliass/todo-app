@@ -16,7 +16,10 @@ import { z } from "zod";
 import { auth } from "@/firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { FirebaseError } from "firebase/app";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 import { Eye, EyeClosed, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 
@@ -55,9 +58,17 @@ export default function SignupForm() {
       terms: false,
     },
   });
+  function sendVerificationEmail() {
+    const user = auth.currentUser;
+
+    if (user) {
+      sendEmailVerification(user);
+    }
+  }
 
   async function submitForm(formValue: FormSchema) {
     setLoading(true);
+
     try {
       await createUserWithEmailAndPassword(
         auth,
@@ -67,6 +78,7 @@ export default function SignupForm() {
 
       setLoading(false);
       form.reset();
+      sendVerificationEmail();
       router.push("/dashboard");
     } catch (err) {
       setLoading(false);
@@ -76,8 +88,6 @@ export default function SignupForm() {
             form.setError("email", { message: "Email already in use" });
             break;
         }
-      } else {
-        return;
       }
     }
   }

@@ -17,7 +17,7 @@ import { addDoc, collection } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { LoaderCircle, Plus } from "lucide-react";
 import { useState } from "react";
-import { UserProvider, UseUser } from "@/app/context/userContext";
+import { UserProvider, UseUser } from "@/context/userContext";
 
 const formSchema = z.object({
   titleTask: z.string().optional(),

@@ -2,11 +2,13 @@
 import TaskCard from "@/components/taskCard/taskCard";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { db } from "@/firebase/firebaseConfig";
-import useVerifySignIn from "@/hooks/useVerifySignIn";
+import { auth, db } from "@/firebase/firebaseConfig";
+import useUserLoggedIn from "@/hooks/useUserLoggedIn";
+import { onAuthStateChanged } from "firebase/auth";
 import { collection, onSnapshot } from "firebase/firestore";
 import { LoaderCircle } from "lucide-react";
-import { useLayoutEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 interface TaskList {
   id: string;
@@ -16,12 +18,24 @@ interface TaskList {
 
 export default function Dashboard() {
   const [tasks, setTasks] = useState<TaskList[]>([]);
-  const { loading } = useVerifySignIn("/signin");
+  const { loading } = useUserLoggedIn("/signin");
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.push("/signin");
+      } else if (!user.emailVerified) {
+        router.push("/verify_email");
+      }
+    });
+    return () => unsubscribe();
+  }, [router]);
 
   useLayoutEffect(() => {
-    async function loadTasks() {
+    function loadTasks() {
       try {
-        await onSnapshot(collection(db, "tasks"), (snapshot) => {
+        onSnapshot(collection(db, "tasks"), (snapshot) => {
           const tasksList = snapshot.docs.map((doc) => ({
             id: doc.id,
             ...(doc.data() as Omit<TaskList, "id">),
