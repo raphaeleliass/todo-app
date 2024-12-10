@@ -7,7 +7,6 @@ import { auth, db } from "@/firebase/firebaseConfig";
 import useUserLoggedIn from "@/hooks/useUserLoggedIn";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, onSnapshot } from "firebase/firestore";
-import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useState } from "react";
 
