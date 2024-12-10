@@ -18,7 +18,6 @@ export default function Signup() {
       </LeftDivPage>
 
       <RightDivPage>
-        <h2 className="text-2xl">Sign Up</h2>
         <SignupForm />
       </RightDivPage>
     </FormPage>

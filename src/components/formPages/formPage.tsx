@@ -3,7 +3,6 @@ import { AllHTMLAttributes, forwardRef } from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { SiFacebook, SiGithub, SiGoogle } from "@icons-pack/react-simple-icons";
 import { Separator } from "../ui/separator";
 
 const FormPage = forwardRef<HTMLDivElement, AllHTMLAttributes<HTMLDivElement>>(
@@ -60,30 +59,6 @@ const RightDivPage = forwardRef<
     {children}
 
     <Separator className="max-w-xs" />
-
-    <div className="flex w-full max-w-xs flex-row items-center justify-center gap-1">
-      <Button
-        variant={"outline"}
-        className="w-full"
-        aria-label="sign up with google button"
-      >
-        <SiGoogle />
-      </Button>
-      <Button
-        variant={"outline"}
-        className="w-full"
-        aria-label="sign up with facebook button"
-      >
-        <SiFacebook />
-      </Button>
-      <Button
-        variant={"outline"}
-        className="w-full"
-        aria-label="sign up with github button"
-      >
-        <SiGithub />
-      </Button>
-    </div>
   </div>
 ));
 

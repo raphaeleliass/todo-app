@@ -2,6 +2,7 @@
 import TaskCard from "@/components/taskCard/taskCard";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { auth, db } from "@/firebase/firebaseConfig";
 import useUserLoggedIn from "@/hooks/useUserLoggedIn";
 import { onAuthStateChanged } from "firebase/auth";
@@ -18,17 +19,16 @@ interface TaskList {
 
 export default function Dashboard() {
   const [tasks, setTasks] = useState<TaskList[]>([]);
-  const { loading } = useUserLoggedIn("/signin");
+  const { loading } = useUserLoggedIn("/");
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        router.push("/signin");
-      } else if (!user.emailVerified) {
-        router.push("/verify_email");
+    const unsubscribe = onAuthStateChanged(auth, (currUser) => {
+      if (currUser && !currUser?.emailVerified) {
+        router.push("/signup");
       }
     });
+
     return () => unsubscribe();
   }, [router]);
 
@@ -52,8 +52,13 @@ export default function Dashboard() {
   return (
     <>
       {loading ? (
-        <div className="flex min-h-dvh w-full items-center justify-center">
-          <LoaderCircle className="animate-spin" />
+        <div className="flex flex-row gap-4">
+          <Skeleton className="h-screen w-72" />
+          <div className="flex w-full flex-wrap items-start justify-start gap-2">
+            {Array.from({ length: 12 }, (_, index) => (
+              <Skeleton className="mt-4 aspect-square size-64" key={index} />
+            ))}
+          </div>
         </div>
       ) : (
         <main className="flex min-h-dvh flex-col items-center justify-center">
@@ -62,7 +67,7 @@ export default function Dashboard() {
             <SidebarTrigger />
 
             <div className="flex w-full items-start justify-center">
-              <div className="flex w-full flex-wrap items-center gap-4 py-10">
+              <div className="flex w-full flex-wrap items-center gap-4 py-10 transition-all">
                 {tasks.length === 0 ? (
                   <div className="mx-auto flex min-h-dvh w-full max-w-xs flex-col items-center justify-center text-balance text-center md:max-w-md md:text-left">
                     <h2 className="font-Poppins text-lg font-semibold drop-shadow-2xl">
