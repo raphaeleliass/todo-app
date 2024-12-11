@@ -6,9 +6,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { auth, db } from "@/firebase/firebaseConfig";
 import useUserLoggedIn from "@/hooks/useUserLoggedIn";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  where,
+} from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface TaskList {
   id: string;
@@ -20,6 +26,7 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState<TaskList[]>([]);
   const { loading } = useUserLoggedIn("/");
   const router = useRouter();
+  const user = auth.currentUser;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currUser) => {
@@ -31,22 +38,26 @@ export default function Dashboard() {
     return () => unsubscribe();
   }, [router]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     function loadTasks() {
-      try {
-        onSnapshot(collection(db, "tasks"), (snapshot) => {
-          const tasksList = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...(doc.data() as Omit<TaskList, "id">),
-          }));
-          setTasks(tasksList);
-        });
-      } catch (err) {
-        alert(err);
-      }
+      const taskRef = collection(db, "tasks");
+      const q = query(
+        taskRef,
+        orderBy("created", "desc"),
+        where("uid", "==", `${user?.uid}`),
+      );
+      onSnapshot(q, (snapshot) => {
+        const taskList = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          title: doc.data().title,
+          task: doc.data().task,
+        }));
+        setTasks(taskList);
+      });
     }
+
     loadTasks();
-  }, []);
+  }, [user]);
 
   return (
     <>

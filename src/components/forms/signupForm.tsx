@@ -1,118 +1,118 @@
 "use client";
 
 // react/next imports
-import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react"; // Hooks para gerenciar estado e efeitos colaterais
+import { useRouter } from "next/navigation"; // Hook para navegação entre páginas
 
 // ui imports
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
-import { Checkbox } from "../ui/checkbox";
-import { Button } from "../ui/button";
-import { Eye, EyeClosed, LoaderCircle } from "lucide-react";
+  Form, // Componente de formulário
+  FormControl, // Componente de controle de formulário
+  FormField, // Componente de campo de formulário
+  FormItem, // Componente de item de formulário
+  FormLabel, // Componente de rótulo de formulário
+  FormMessage, // Componente de mensagem de formulário
+} from "../ui/form"; // Importando componentes de UI para formulários
+import { Input } from "../ui/input"; // Componente de entrada de texto
+import { Checkbox } from "../ui/checkbox"; // Componente de checkbox
+import { Button } from "../ui/button"; // Componente de botão
+import { Eye, EyeClosed, LoaderCircle } from "lucide-react"; // Ícones para visibilidade de senha e carregamento
 
 // validação de formulário imports
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod"; // Biblioteca de validação de esquema
+import { useForm } from "react-hook-form"; // Hook para gerenciamento de formulários
+import { zodResolver } from "@hookform/resolvers/zod"; // Resolvedor para integração com Zod
 
 // firebase imports
-import { auth } from "@/firebase/firebaseConfig";
-import { FirebaseError } from "firebase/app";
+import { auth } from "@/firebase/firebaseConfig"; // Configuração de autenticação do Firebase
+import { FirebaseError } from "firebase/app"; // Erro do Firebase
 import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  sendEmailVerification,
-  updateProfile,
-} from "firebase/auth";
+  createUserWithEmailAndPassword, // Função para criar usuário com email e senha
+  onAuthStateChanged, // Função para observar mudanças no estado de autenticação
+  sendEmailVerification, // Função para enviar verificação de email
+  updateProfile, // Função para atualizar o perfil do usuário
+} from "firebase/auth"; // Importando funções de autenticação do Firebase
 
 // schema do formulário
 const formSchema = z
   .object({
-    name: z.string().min(1, "Name field can't be empty").trim(),
+    name: z.string().min(1, "Name field can't be empty").trim(), // Validação do nome
     lastName: z
       .string()
       .min(3, "Last name must be 3 characters at least")
-      .trim(),
-    email: z.string().email("This email isn't valid").trim(),
+      .trim(), // Validação do sobrenome
+    email: z.string().email("This email isn't valid").trim(), // Validação do email
     password: z
       .string()
       .min(6, "Password must be 6 characters at least")
-      .trim(),
-    confirmPassword: z.string(),
-    terms: z.boolean().refine((value) => value),
+      .trim(), // Validação da senha
+    confirmPassword: z.string(), // Validação da confirmação da senha
+    terms: z.boolean().refine((value) => value), // Validação dos termos
   })
   .refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"],
-    message: "Password must be the same",
+    path: ["confirmPassword"], // Caminho para o erro
+    message: "Password must be the same", // Mensagem de erro
   });
 
 // inferência de tipo
-type FormSchema = z.infer<typeof formSchema>;
+type FormSchema = z.infer<typeof formSchema>; // Tipo inferido do esquema do formulário
 
 export default function SignupForm() {
   // validação de formulário
   const form = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema), // Resolvedor para validação
     defaultValues: {
-      name: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      terms: false,
+      name: "", // Valor padrão para nome
+      lastName: "", // Valor padrão para sobrenome
+      email: "", // Valor padrão para email
+      password: "", // Valor padrão para senha
+      confirmPassword: "", // Valor padrão para confirmação de senha
+      terms: false, // Valor padrão para termos
     },
   });
 
   // state de loading
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false); // Estado de carregamento
 
   // state para mostrar senha
   const [mainPasswordVisible, setMainPasswordVisible] =
-    useState<boolean>(false);
+    useState<boolean>(false); // Estado para visibilidade da senha principal
 
   // state para mostrar senha de confirmação
   const [confirmPasswordVisible, setConfirmPasswordVisible] =
-    useState<boolean>(false);
+    useState<boolean>(false); // Estado para visibilidade da senha de confirmação
 
   // state para trocar o formulário pela verificação de email de usuário
   const [showEmailValidation, setShowEmailValidation] =
-    useState<boolean>(false);
+    useState<boolean>(false); // Estado para mostrar validação de email
 
   // constante que carrega os dados do usuário logado
-  const user = auth.currentUser;
+  const user = auth.currentUser; // Usuário atual autenticado
 
   // constante responsável por instanciar o next navigation
-  const router = useRouter();
+  const router = useRouter(); // Instância do roteador
 
   // adiciona nome e sobrenome para o usuário
   async function setAdditionalUserInformation(
     userName: string,
     lastName: string,
   ) {
-    const user = auth.currentUser;
+    const user = auth.currentUser; // Usuário atual
     try {
       if (user) {
         await updateProfile(user, {
-          displayName: `${userName} ${lastName}`,
+          displayName: `${userName} ${lastName}`, // Atualiza o nome de exibição do usuário
         });
       }
     } catch (err) {
-      alert(err);
+      alert(err); // Exibe erro
     }
   }
 
   // envia verificação de email para o usuário
   const sendVerificationEmail = useCallback(() => {
     if (user) {
-      sendEmailVerification(user);
+      sendEmailVerification(user); // Envia email de verificação
     }
   }, [user]);
 
@@ -120,47 +120,47 @@ export default function SignupForm() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currUser) => {
       if (currUser && currUser.emailVerified) {
-        router.push("/dashboard");
+        router.push("/dashboard"); // Redireciona para o dashboard se o email estiver verificado
       } else if (currUser && !currUser.emailVerified) {
-        sendVerificationEmail();
-        setShowEmailValidation(true);
+        sendVerificationEmail(); // Envia email de verificação
+        setShowEmailValidation(true); // Mostra validação de email
       }
     });
 
-    return () => unsubscribe();
+    return () => unsubscribe(); // Limpa o observador
   }, [router, sendVerificationEmail]);
 
   // troca o formulário para o aviso de validação do email
   function showValidationEmail() {
     if (!user?.emailVerified) {
-      setShowEmailValidation(true);
+      setShowEmailValidation(true); // Mostra validação de email
     } else {
-      router.push("/dashboard");
+      router.push("/dashboard"); // Redireciona para o dashboard
     }
   }
 
   // envia o formulário de cadastro para o firebase com as informações necessárias para o cadastro
   async function submitForm(formValue: FormSchema) {
-    setLoading(true);
+    setLoading(true); // Ativa o estado de carregamento
 
     try {
       await createUserWithEmailAndPassword(
         auth,
         formValue.email,
         formValue.password,
-      );
+      ); // Cria usuário com email e senha
 
-      await setAdditionalUserInformation(formValue.name, formValue.lastName);
-      setLoading(false);
-      form.reset();
-      sendVerificationEmail();
-      showValidationEmail();
+      form.reset(); // Reseta o formulário
+      setLoading(false); // Desativa o estado de carregamento
+      await setAdditionalUserInformation(formValue.name, formValue.lastName); // Adiciona informações do usuário
+      sendVerificationEmail(); // Envia email de verificação
+      showValidationEmail(); // Mostra validação de email
     } catch (err) {
-      setLoading(false);
+      setLoading(false); // Desativa o estado de carregamento
       if (err instanceof FirebaseError) {
         switch (err.code) {
           case "auth/email-already-in-use":
-            form.setError("email", { message: "Email already in use" });
+            form.setError("email", { message: "Email already in use" }); // Define erro para email já em uso
 
             break;
         }
@@ -170,16 +170,16 @@ export default function SignupForm() {
 
   // atualiza a página ao clicar no botão
   function refreshPage() {
-    window.location.reload();
+    window.location.reload(); // Atualiza a página
   }
 
   // mostra a senha digitada pelo usuário
   function toggleMainPasswordVisibility() {
-    setMainPasswordVisible((prev) => !prev);
+    setMainPasswordVisible((prev) => !prev); // Alterna visibilidade da senha principal
   }
   // mostra a senha de confirmação digitada pelo usuários
   function toggleConfirmPasswordVisibility() {
-    setConfirmPasswordVisible((prev) => !prev);
+    setConfirmPasswordVisible((prev) => !prev); // Alterna visibilidade da senha de confirmação
   }
 
   return (

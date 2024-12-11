@@ -1,46 +1,58 @@
 "use client";
-import { useForm } from "react-hook-form";
+
+import { useState } from "react"; // Hook para gerenciar estado
+import { useRouter } from "next/navigation"; // Hook para navegação entre páginas
+
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  Form, // Componente de formulário
+  FormControl, // Componente de controle de formulário
+  FormField, // Componente de campo de formulário
+  FormItem, // Componente de item de formulário
+  FormLabel, // Componente de rótulo de formulário
+  FormMessage, // Componente de mensagem de formulário
 } from "../ui/form";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { auth } from "@/firebase/firebaseConfig";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { useRouter } from "next/navigation";
-import { FirebaseError } from "firebase/app";
-import { Eye, EyeClosed, LoaderCircle } from "lucide-react";
+import { Input } from "../ui/input"; // Componente de entrada de texto
+import { Button } from "../ui/button"; // Componente de botão
+import { Eye, EyeClosed, LoaderCircle } from "lucide-react"; // Ícones para visibilidade de senha e carregamento
+
+import { z } from "zod"; // Biblioteca de validação de esquema
+import { useForm } from "react-hook-form"; // Hook para gerenciamento de formulários
+import { zodResolver } from "@hookform/resolvers/zod"; // Resolvedor para integração com Zod
+
+import { FirebaseError } from "firebase/app"; // Erro do Firebase
+import { auth } from "@/firebase/firebaseConfig"; // Configuração de autenticação do Firebase
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth"; // Funções de autenticação
 
 const formSchema = z.object({
-  email: z.string().email("Invalid email"),
-  password: z.string().min(1, "Password can't be empty"),
+  email: z.string().email("Invalid email"), // Validação de email
+  password: z.string().min(1, "Password can't be empty"), // Validação de senha
 });
 
-type FormSchema = z.infer<typeof formSchema>;
+type FormSchema = z.infer<typeof formSchema>; // Tipo inferido do esquema do formulário
 
 export default function SigninForm() {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
-  const router = useRouter();
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false); // Estado para visibilidade da senha
+  const [loading, setLoading] = useState<boolean>(false); // Estado de carregamento
+  const router = useRouter(); // Instância do roteador
 
   const form = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema), // Resolvedor para validação
     defaultValues: {
-      email: "",
-      password: "",
+      email: "", // Valor padrão para email
+      password: "", // Valor padrão para senha
     },
   });
 
+  onAuthStateChanged(auth, (user) => {
+    // Observador de estado de autenticação
+    if (user) {
+      router.push("/dashboard"); // Redireciona para o dashboard se o usuário estiver autenticado
+    }
+  });
+
   async function submitForm(formValue: FormSchema) {
-    setLoading(true);
+    // Função para enviar o formulário
+    setLoading(true); // Ativa o estado de carregamento
 
     try {
       await signInWithEmailAndPassword(
@@ -48,32 +60,33 @@ export default function SigninForm() {
         formValue.email,
         formValue.password,
       );
-
-      setLoading(false);
-      router.push("/dashboard");
+      setLoading(false); // Desativa o estado de carregamento
+      router.push("/dashboard"); // Redireciona para o dashboard
     } catch (err) {
-      setLoading(false);
+      setLoading(false); // Desativa o estado de carregamento
 
       if (err instanceof FirebaseError) {
+        // Verifica se o erro é do Firebase
         switch (err.code) {
           case "auth/invalid-credential":
-            form.setError("email", { message: "Email or password invalid" });
-            form.setError("password", { message: "Email or password invalid" });
-            setLoading(false);
+            form.setError("email", { message: "Email or password invalid" }); // Define erro para email
+            form.setError("password", { message: "Email or password invalid" }); // Define erro para senha
+            setLoading(false); // Desativa o estado de carregamento
         }
       }
     }
   }
 
   function togglePasswordVisibility() {
-    setPasswordVisible((prev) => !prev);
+    // Função para alternar visibilidade da senha
+    setPasswordVisible((prev) => !prev); // Alterna o estado de visibilidade
   }
 
   return (
     <Form {...form}>
       <form
         className={`flex w-full max-w-xs flex-col gap-6 ${loading && "opacity-60"}`}
-        onSubmit={form.handleSubmit(submitForm)}
+        onSubmit={form.handleSubmit(submitForm)} // Envia o formulário
       >
         <FormField
           name="email"
@@ -112,7 +125,7 @@ export default function SigninForm() {
                   <span
                     role="button"
                     className="absolute right-2"
-                    onClick={togglePasswordVisibility}
+                    onClick={togglePasswordVisibility} // Alterna visibilidade da senha
                   >
                     {passwordVisible ? (
                       <EyeClosed className="size-5" />
