@@ -10,7 +10,6 @@ import {
   SidebarMenuItem,
 } from "./sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
-import { Button } from "./button";
 import { signOut } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { LogOut } from "lucide-react";
