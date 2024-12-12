@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Button } from "./button";
 import { signOut } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
+import { LogOut } from "lucide-react";
 
 export function AppSidebar() {
   async function signoutUser() {
@@ -37,7 +38,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarHeader>
-      <SidebarFooter className="flex flex-row items-center">
+      <SidebarFooter className="mb-4 mt-auto flex flex-row items-center justify-between">
         <Avatar>
           <AvatarImage>{user?.photo}</AvatarImage>
           <AvatarFallback>
@@ -49,9 +50,9 @@ export function AppSidebar() {
           <p className="text-xs">{user?.email}</p>
         </div>
 
-        <Button variant={"secondary"} onClick={signoutUser}>
-          Sign out
-        </Button>
+        <button aria-label="sign out button" onClick={signoutUser}>
+          <LogOut className="size-5" />
+        </button>
       </SidebarFooter>
     </Sidebar>
   );
