@@ -90,7 +90,7 @@ export default function TaskCard({ title, task, taskID }: taskCardProps) {
       </CardContent>
       <CardFooter>
         {taskField ? (
-          <Button onClick={updateTask}>
+          <Button className="w-full" onClick={updateTask}>
             <Check />
           </Button>
         ) : (
