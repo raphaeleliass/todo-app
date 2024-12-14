@@ -38,9 +38,9 @@ export default function TaskCard({ title, task, taskID }: taskCardProps) {
   // Função para deletar a tarefa
   async function deleteTask() {
     try {
-      await deleteDoc(doc(db, "tasks", taskID)); // Deleta a tarefa do Firestore
+      await deleteDoc(doc(db, "tasks", taskID));
     } catch (err) {
-      alert(err); // Exibe erro
+      alert(err);
     }
   }
 
@@ -48,18 +48,18 @@ export default function TaskCard({ title, task, taskID }: taskCardProps) {
   async function updateTask() {
     try {
       await updateDoc(doc(db, "tasks", taskID), {
-        title: editedTitle, // Atualiza o título
-        task: editedTask, // Atualiza a descrição
+        title: editedTitle,
+        task: editedTask,
       });
-      setTaskField(false); // Fecha o campo de edição
+      setTaskField(false);
     } catch (err) {
-      alert(err); // Exibe erro
+      alert(err);
     }
   }
 
   // Função para habilitar o modo de edição
   function editTask() {
-    setTaskField(true); // Ativa o campo de edição
+    setTaskField(true);
   }
 
   return (
@@ -80,7 +80,7 @@ export default function TaskCard({ title, task, taskID }: taskCardProps) {
         <CardDescription className="text-balance">
           {taskField ? (
             <Textarea
-              defaultValue={task + editedTask}
+              defaultValue={task}
               onChange={(e) => setEditedTask(e.target.value)}
             />
           ) : (

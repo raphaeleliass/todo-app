@@ -1,10 +1,9 @@
 "use client";
+// form imports
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
-// Importando hooks e funções do React
-import { useState } from "react"; // Hook para gerenciar estado
-import { useForm } from "react-hook-form"; // Hook para gerenciamento de formulários
-
-// Importando componentes de UI
+// ui imports
 import {
   Form,
   FormControl,
@@ -12,64 +11,59 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form"; // Componentes de formulário
-import { Textarea } from "../ui/textarea"; // Componente de textarea
-import { Input } from "../ui/input"; // Componente de entrada de texto
-import { Button } from "../ui/button"; // Componente de botão
+} from "../ui/form";
+import { Textarea } from "../ui/textarea";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { LoaderCircle, Plus } from "lucide-react";
 
-// Importando biblioteca de validação
-import { z } from "zod"; // Biblioteca de validação de esquema
-import { zodResolver } from "@hookform/resolvers/zod"; // Resolvedor para integração com Zod
+// validação de formulário imports
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-// Importando funções do Firebase
-import { addDoc, collection } from "firebase/firestore"; // Funções para manipulação de documentos no Firestore
-import { db } from "@/firebase/firebaseConfig"; // Configuração do Firebase
+// firebase imports
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
 
-// Importando ícones
-import { LoaderCircle, Plus } from "lucide-react"; // Ícones para carregamento e adição
+// context api import
+import { UserProvider, UseUser } from "@/context/userContext";
 
-// Importando contexto de usuário
-import { UserProvider, UseUser } from "@/context/userContext"; // Contexto para gerenciamento de usuário
-
-// Definindo o esquema de validação do formulário
+// atribuição dos tipos de cada campo
 const formSchema = z.object({
-  titleTask: z.string().optional(), // Título da tarefa (opcional)
-  task: z.string().min(1, "This field can't be empty"), // Tarefa (obrigatório)
+  titleTask: z.string().optional(),
+  task: z.string().min(1, "This field can't be empty"),
 });
 
-// Inferindo o tipo do esquema do formulário
+// inferencia dos tipos
 type FormSchema = z.infer<typeof formSchema>;
 
-// Componente principal do formulário de tarefas
 export default function TaskForm() {
-  const [loading, setLoading] = useState<boolean>(false); // Estado de carregamento
-  const { user } = UseUser(); // Obtendo informações do usuário do contexto
+  const [loading, setLoading] = useState<boolean>(false);
+  const { user } = UseUser();
 
-  // Configurando o formulário com validação
   const form = useForm<FormSchema>({
-    resolver: zodResolver(formSchema), // Resolvedor para validação
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      titleTask: "", // Valor padrão para título da tarefa
-      task: "", // Valor padrão para tarefa
+      titleTask: "",
+      task: "",
     },
   });
 
-  // Função para lidar com o envio do formulário
+  // envio do formulário
   async function handleSubmitForm(formValue: FormSchema) {
-    setLoading(true); // Ativando estado de carregamento
+    setLoading(true);
     try {
-      // Adicionando nova tarefa ao Firestore
       await addDoc(collection(db, "tasks"), {
-        title: formValue.titleTask, // Título da tarefa
-        task: formValue.task, // Conteúdo da tarefa
-        uid: user?.uid, // ID do usuário
-        created: new Date(), // Data de criação
+        title: formValue.titleTask,
+        task: formValue.task,
+        uid: user?.uid,
+        created: new Date(),
       });
-      form.reset(); // Resetando o formulário
-      setLoading(false); // Desativando estado de carregamento
+      form.reset();
+      setLoading(false);
     } catch (err) {
-      alert(err); // Exibindo erro
-      setLoading(false); // Desativando estado de carregamento
+      alert(err);
+      setLoading(false);
     }
   }
 
@@ -78,7 +72,7 @@ export default function TaskForm() {
       <Form {...form}>
         <form
           className={`flex flex-col gap-4 ${loading && "opacity-60"}`}
-          onSubmit={form.handleSubmit(handleSubmitForm)} 
+          onSubmit={form.handleSubmit(handleSubmitForm)}
         >
           <FormField
             name="titleTask"
