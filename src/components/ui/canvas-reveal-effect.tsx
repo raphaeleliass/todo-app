@@ -24,7 +24,7 @@ export const CanvasRevealEffect = ({
   showGradient?: boolean;
 }) => {
   return (
-    <div className={cn("h-full relative bg-white w-full", containerClassName)}>
+    <div className={cn("relative h-full w-full bg-white", containerClassName)}>
       <div className="h-full w-full">
         <DotMatrix
           colors={colors ?? [[0, 255, 255]]}
@@ -203,15 +203,18 @@ const ShaderMaterial = ({
     }
     lastFrameTime = timestamp;
 
+    // eslint-disable-next-line
     const material: any = ref.current.material;
     const timeLocation = material.uniforms.u_time;
     timeLocation.value = timestamp;
   });
 
   const getUniforms = () => {
+    //eslint-disable-next-line
     const preparedUniforms: any = {};
 
     for (const uniformName in uniforms) {
+      //eslint-disable-next-line
       const uniform: any = uniforms[uniformName];
 
       switch (uniform.type) {
@@ -230,7 +233,7 @@ const ShaderMaterial = ({
         case "uniform3fv":
           preparedUniforms[uniformName] = {
             value: uniform.value.map((v: number[]) =>
-              new THREE.Vector3().fromArray(v)
+              new THREE.Vector3().fromArray(v),
             ),
             type: "3fv",
           };
@@ -268,20 +271,23 @@ const ShaderMaterial = ({
         gl_Position = vec4(x, y, 0.0, 1.0);
         fragCoord = (position.xy + vec2(1.0)) * 0.5 * u_resolution;
         fragCoord.y = u_resolution.y - fragCoord.y;
-      }
-      `,
+        }
+        `,
       fragmentShader: source,
       uniforms: getUniforms(),
       glslVersion: THREE.GLSL3,
       blending: THREE.CustomBlending,
       blendSrc: THREE.SrcAlphaFactor,
+
       blendDst: THREE.OneFactor,
     });
 
     return materialObject;
+    //eslint-disable-next-line
   }, [size.width, size.height, source]);
 
   return (
+    //eslint-disable-next-line
     <mesh ref={ref as any}>
       <planeGeometry args={[2, 2]} />
       <primitive object={material} attach="material" />
@@ -291,7 +297,7 @@ const ShaderMaterial = ({
 
 const Shader: React.FC<ShaderProps> = ({ source, uniforms, maxFps = 60 }) => {
   return (
-    <Canvas className="absolute inset-0  h-full w-full">
+    <Canvas className="absolute inset-0 h-full w-full">
       <ShaderMaterial source={source} uniforms={uniforms} maxFps={maxFps} />
     </Canvas>
   );
