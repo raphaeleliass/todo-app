@@ -81,17 +81,15 @@
   body {
     @apply bg-background font-Montserrat text-foreground;
   }
-}
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
+  h2,
+  h3,
+  h4,
+  h5 {
+    @apply text-3xl;
   }
 
-  main{
-    @apply w-full
+  section {
+    @apply flex min-h-dvh w-full items-center justify-center;
   }
 }

@@ -41,8 +41,6 @@ export const metadata: Metadata = {
     "simple task organizer",
     "boost productivity",
   ],
-  viewport: "width=device-width, initial-scale=1.0",
-  themeColor: "#ffffff",
   robots:
     "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
   openGraph: {
@@ -62,6 +60,8 @@ export const metadata: Metadata = {
     creator: "@faeleliass",
   },
 };
+
+
 
 export default function RootLayout({
   children,
